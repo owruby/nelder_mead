@@ -34,19 +34,37 @@ class NelderMead(object):
         self._opt(n_iter)
 
     def func_impl(self, x):
+        objval, invalid = None, False
         for i, t in enumerate(x):
             if t < self.p_min[i] or t > self.p_max[i]:
-                return self._coef * float("inf")
-        return self._coef * self.func(x)
+                objval = self._coef * float("inf")
+                invalid = True
+        if not invalid:
+            objval = self._coef * self.func(x)
+
+        print("{:5d} | {} | {:>15.5f}".format(
+            self.n_eval,
+            " | ".join(["{:>15.5f}".format(t) for t in x]),
+            objval
+        ))
+        self.n_eval += 1
+
+        return objval
 
     def _opt(self, n_iter):
+        # Print Header
+        print("{:>5} | {} | {:>15}".format(
+            "Eval",
+            " | ".join(["{:>15}".format(name) for name in self.names]),
+            "ObjVal"
+        ))
+        print("-" * (20 + self.dim * 20))
+
         for p in self.simplex:
             p.f = self.func_impl(p.x)
 
         for i in range(n_iter):
-            # TODO: reverse for min or max target
             self.simplex = sorted(self.simplex, key=lambda p: p.f)
-            print(self.simplex[0])
 
             # centroid
             p_c = self._centroid()
@@ -82,6 +100,9 @@ class NelderMead(object):
                     self.simplex[j + 1] = p
             else:
                 self.simplex[-1] = p_r
+
+        self.simplex = sorted(self.simplex, key=lambda p: p.f)
+        print("\nBest Point: {}".format(self.simplex[0]))
 
     def _centroid(self):
         p_c = Point(self.dim)
