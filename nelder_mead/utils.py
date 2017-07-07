@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def plot2d_simplex(simplex, ind):
-    fig_dir = "./figures/"
+    fig_dir = "./"
     plt.cla()
     plt.xlim((-512, 512))
     plt.ylim((-512, 512))

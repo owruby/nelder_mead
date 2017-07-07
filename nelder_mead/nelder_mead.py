@@ -19,12 +19,12 @@ class NelderMead(object):
         self._parse_minmax(params)
         self._initialize()
 
-    def maximize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=0.5, delta_oc=0.5, gamma_s=0.5):
+    def maximize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
         self._coef = -1
         variables = locals()
         for k, v in variables.items():
             setattr(self, k, v)
-        self._opt(n_iter, locals())
+        self._opt(n_iter)
 
     def minimize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
         self._coef = 1
@@ -37,7 +37,7 @@ class NelderMead(object):
         objval, invalid = None, False
         for i, t in enumerate(x):
             if t < self.p_min[i] or t > self.p_max[i]:
-                objval = self._coef * float("inf")
+                objval = float("inf")
                 invalid = True
         if not invalid:
             objval = self._coef * self.func(x)
@@ -45,10 +45,10 @@ class NelderMead(object):
         print("{:5d} | {} | {:>15.5f}".format(
             self.n_eval,
             " | ".join(["{:>15.5f}".format(t) for t in x]),
-            objval
+            self._coef * objval
         ))
-        self.n_eval += 1
 
+        self.n_eval += 1
         return objval
 
     def _opt(self, n_iter):
@@ -90,8 +90,8 @@ class NelderMead(object):
                     if p_cont < self.simplex[-1]:
                         self.simplex[-1] = p_cont
                         continue
+
                 # Shirnk
-                print("shrink")
                 for j in range(len(self.simplex) - 1):
                     p = Point(self.dim)
                     p.x = self.simplex[0].x + self.gamma_s * \
