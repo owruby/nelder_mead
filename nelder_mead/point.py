@@ -10,7 +10,9 @@ class Point(object):
         self.f = 0
 
     def __str__(self):
-        return "Params: {}, ObjValue: {}".format(", ".join(["{:>10.5f}".format(x) for x in self.x]), self.f)
+        return "Params: {}, ObjValue: {}".format(
+            ", ".join(["{:>10.5f}".format(x) for x in self.x]), 
+            self.f)
 
     def __eq__(self, rhs):
         return self.f == rhs.f
