@@ -10,6 +10,7 @@ class NelderMead(object):
     def __init__(self, func, params, *args, **kwargs):
         self.func = func
         self.dim = len(params)
+        self.n_eval = 0
         self.names = []
         self.p_min = []
         self.p_max = []
@@ -19,20 +20,29 @@ class NelderMead(object):
         self._initialize()
 
     def maximize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=0.5, delta_oc=0.5, gamma_s=0.5):
-        self._coef = 1
+        self._coef = -1
         variables = locals()
         for k, v in variables.items():
             setattr(self, k, v)
         self._opt(n_iter, locals())
 
     def minimize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
-        self._coef = -1
+        self._coef = 1
         variables = locals()
         for k, v in variables.items():
             setattr(self, k, v)
         self._opt(n_iter)
 
+    def func_impl(self, x):
+        for i, t in enumerate(x):
+            if t < self.p_min[i] or t > self.p_max[i]:
+                return self._coef * float("inf")
+        return self._coef * self.func(x)
+
     def _opt(self, n_iter):
+        for p in self.simplex:
+            p.f = self.func_impl(p.x)
+
         for i in range(n_iter):
             # TODO: reverse for min or max target
             self.simplex = sorted(self.simplex, key=lambda p: p.f)
@@ -68,7 +78,7 @@ class NelderMead(object):
                     p = Point(self.dim)
                     p.x = self.simplex[0].x + self.gamma_s * \
                         (self.simplex[j + 1].x - self.simplex[0].x)
-                    p.f = self.func(p.x)
+                    p.f = self.func_impl(p.x)
                     self.simplex[j + 1] = p
             else:
                 self.simplex[-1] = p_r
@@ -96,7 +106,7 @@ class NelderMead(object):
     def _generate_point(self, p_c, x_coef):
         p = Point(self.dim)
         p.x = p_c.x + x_coef * (p_c.x - self.simplex[-1].x)
-        p.f = self.func(p.x)
+        p.f = self.func_impl(p.x)
         return p
 
     def _parse_minmax(self, params):
@@ -111,5 +121,4 @@ class NelderMead(object):
             init_val = [(m2 - m1) * np.random.random() + m1 for m1,
                         m2 in zip(self.p_min, self.p_max)]
             p.x = np.array(init_val, dtype=np.float32)
-            p.f = self.func(p.x)
             self.simplex.append(p)
