@@ -1,0 +1,3 @@
+*.pyc
+figures/*
+.DS_Store
