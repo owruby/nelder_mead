@@ -2,10 +2,17 @@
 
 The easy implementation of the Nelder-Mead method.
 
+## Description
+
+The Nelder-Mead is the one of derivative-free optimization method.
+This method is called simplex method or ameba method.
+
+![result](https://github.com/owruby/nelder_mead/blob/master/figures/anim.gif)
+
 ## Installation
 
 ```
-pip install pip install git+https://github.com/owruby/nelder_mead.git
+pip install git+https://github.com/owruby/nelder_mead.git
 ```
 
 ### Dependencies
