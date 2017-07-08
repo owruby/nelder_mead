@@ -2,12 +2,27 @@
 
 import numpy as np
 
-from point import Point
+from nelder_mead.point import Point
 
 
 class NelderMead(object):
 
     def __init__(self, func, params, *args, **kwargs):
+        """ the Nelder-Mead method
+
+        :param func: objective function object
+        :param params: dict, tuning parameter, name: (min, max)
+
+        ---
+        NelderMead(
+             lambda x: x[0]**2 + 5 * x[1],
+             {
+                 "x1": (1, 5),
+                 "x2": (0, 3),
+             }
+        )
+
+        """
         self.func = func
         self.dim = len(params)
         self.n_eval = 0
@@ -20,6 +35,16 @@ class NelderMead(object):
         self._initialize()
 
     def maximize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
+        """ Maximize the objective function.
+
+        :param n_iter: the number of iterations for the nelder_mead method
+        :param delta_r: the parameter of reflect
+        :param delta_e: the parameter of expand
+        :param delta_ic: the parameter of inside contraction
+        :param delta_oc: the parameter of outside contraction
+        :param gamma_s: the parameter of shrink
+
+        """
         self._coef = -1
         variables = locals()
         for k, v in variables.items():
@@ -27,6 +52,16 @@ class NelderMead(object):
         self._opt(n_iter)
 
     def minimize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
+        """ Minimize the objective function.
+
+        :param n_iter: the number of iterations for the nelder_mead method
+        :param delta_r: the parameter of reflect
+        :param delta_e: the parameter of expand
+        :param delta_ic: the parameter of inside contraction
+        :param delta_oc: the parameter of outside contraction
+        :param gamma_s: the parameter of shrink
+
+        """
         self._coef = 1
         variables = locals()
         for k, v in variables.items():
@@ -65,6 +100,7 @@ class NelderMead(object):
 
         for i in range(n_iter):
             self.simplex = sorted(self.simplex, key=lambda p: p.f)
+            # utils.plot2d_simplex(self.simplex, i)
 
             # centroid
             p_c = self._centroid()
