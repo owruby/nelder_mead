@@ -37,10 +37,10 @@ class NelderMead(object):
     def initialize(self, init_params):
         """ Inialize first simplex point
 
-        :param init_params(list): 
+        :param init_params(list):
 
         """
-        # TODO: check the number of init_params and self.dim
+        assert len(init_params) == (self.dim + 1), "Invalid the length of init_params"
         for param in init_params:
             p = Point(self.dim)
             p.x = np.array(param, dtype=np.float32)

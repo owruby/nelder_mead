@@ -6,10 +6,12 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 import copy
+import argparse
 
 import chainer
 from chainer import links as L
 from chainer import functions as F
+from chainer import cuda
 from chainer.dataset.convert import concat_examples
 
 from nelder_mead import NelderMead
@@ -35,12 +37,21 @@ class MLP(chainer.Chain):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--gpu", type=int, default=-1, help="use gpu")
+    args = parser.parse_args()
+
     train_data, test_data = chainer.datasets.get_mnist()
 
     train_iter = chainer.iterators.SerialIterator(
         train_data, 100, repeat=False, shuffle=True)
     test_iter = chainer.iterators.SerialIterator(
         test_data, 100, repeat=False, shuffle=False)
+    device = -1
+
+    if args.gpu > -1:
+        cuda.get_device().use()
+        device = 0
 
     def train(x):
         epochs = 50
@@ -50,6 +61,8 @@ def main():
         momentum = x[1]
 
         model = MLP()
+        if args.gpu > -1:
+            model.to_gpu()
         optimizer = chainer.optimizers.MomentumSGD(lr=lr, momentum=momentum)
         optimizer.setup(model)
 
@@ -60,7 +73,7 @@ def main():
 
             data_iter = copy.copy(train_iter)
             for batch in data_iter:
-                x, t = concat_examples(batch)
+                x, t = concat_examples(batch, device=device)
                 optimizer.update(model, x, t)
                 accuracy.append(float(model.accuracy.data))
             train_accuracy = np.mean(accuracy)
@@ -68,7 +81,7 @@ def main():
             del accuracy[:]
             data_iter = copy.copy(test_iter)
             for batch in data_iter:
-                x, t = concat_examples(batch)
+                x, t = concat_examples(batch, device=device)
                 model(x, t)
                 accuracy.append(float(model.accuracy.data))
 
