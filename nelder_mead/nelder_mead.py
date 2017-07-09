@@ -30,9 +30,22 @@ class NelderMead(object):
         self.p_min = []
         self.p_max = []
         self.simplex = []
+        self.initialized = False
 
         self._parse_minmax(params)
-        self._initialize()
+
+    def initialize(self, init_params):
+        """ Inialize first simplex point
+
+        :param init_params(list): 
+
+        """
+        # TODO: check the number of init_params and self.dim
+        for param in init_params:
+            p = Point(self.dim)
+            p.x = np.array(param, dtype=np.float32)
+            self.simplex.append(p)
+        self.initlized = True
 
     def maximize(self, n_iter=20, delta_r=1, delta_e=2, delta_ic=-0.5, delta_oc=0.5, gamma_s=0.5):
         """ Maximize the objective function.
@@ -95,12 +108,13 @@ class NelderMead(object):
         ))
         print("-" * (20 + self.dim * 20))
 
+        if not self.initialized:
+            self._initialize()
         for p in self.simplex:
             p.f = self.func_impl(p.x)
 
         for i in range(n_iter):
             self.simplex = sorted(self.simplex, key=lambda p: p.f)
-            # utils.plot2d_simplex(self.simplex, i)
 
             # centroid
             p_c = self._centroid()

@@ -9,11 +9,11 @@ def plot2d_simplex(simplex, ind):
     fig_dir = "./"
     plt.cla()
     n = 1000
-    x1 = np.linspace(-256, 768, n)
-    x2 = np.linspace(-256, 768, n)
+    x1 = np.linspace(-256, 1024, n)
+    x2 = np.linspace(-256, 1024, n)
     X, Y = np.meshgrid(x1, x2)
     Z = np.sqrt(X ** 2 + Y ** 2)
-    plt.contour(X, Y, Z, levels=list(np.arange(0, 800, 10)))
+    plt.contour(X, Y, Z, levels=list(np.arange(0, 1200, 10)))
     plt.gca().set_aspect("equal")
     plt.xlim((-256, 768))
     plt.ylim((-256, 768))
