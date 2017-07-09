@@ -20,10 +20,10 @@ import numpy as np
 
 class MLP(chainer.Chain):
 
-    def __init__(self,):
+    def __init__(self, h_units):
         super(MLP, self).__init__(
-            l1=L.Linear(784, 300),
-            l2=L.Linear(300, 10)
+            l1=L.Linear(784, h_units),
+            l2=L.Linear(h_units, 10)
         )
 
     def __call__(self, x, t):
@@ -57,10 +57,9 @@ def main():
         epochs = 50
         stepsizes = [40]
         gamma = 0.1
-        lr = x[0]
-        momentum = x[1]
+        lr, momentum, h_units = x
 
-        model = MLP()
+        model = MLP(h_units)
         if args.gpu > -1:
             model.to_gpu()
         optimizer = chainer.optimizers.MomentumSGD(lr=lr, momentum=momentum)
@@ -93,11 +92,12 @@ def main():
         return test_accuracy
 
     hp = OrderedDict()
-    hp["lr"] = (0.001, 0.05)
-    hp["momentum"] = (0.7, 0.95)
+    hp["lr"] = ["real", (0.001, 0.05)]
+    hp["momentum"] = ["real", (0.7, 0.95)]
+    hp["h_untis"] = ["integer", (100, 500)]
 
     nm = NelderMead(train, hp)
-    nm.initialize([(0.04, 0.88), (0.01, 0.92), (0.02, 0.9)])
+    nm.initialize([(0.04, 0.88, 100), (0.01, 0.92, 200), (0.02, 0.9, 300), (0.01, 0.9, 250)])
     nm.maximize()
 
 if __name__ == "__main__":

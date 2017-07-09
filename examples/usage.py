@@ -10,8 +10,8 @@ def sphere(x):
 def main():
     func = sphere
     params = {
-        "x1": (-512, 512),
-        "x2": (-512, 512),
+        "x1": ["real", (-512, 512)],
+        "x2": ["real", (-512, 512)],
     }
 
     nm = NelderMead(func, params)

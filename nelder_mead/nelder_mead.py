@@ -27,6 +27,7 @@ class NelderMead(object):
         self.dim = len(params)
         self.n_eval = 0
         self.names = []
+        self.p_types = []
         self.p_min = []
         self.p_max = []
         self.simplex = []
@@ -88,6 +89,7 @@ class NelderMead(object):
                 objval = float("inf")
                 invalid = True
         if not invalid:
+            x = [int(np.round(x_t)) if p_t is "integer" else x_t for p_t, x_t in zip(self.p_types, x)]
             objval = self._coef * self.func(x)
 
         print("{:5d} | {} | {:>15.5f}".format(
@@ -181,10 +183,14 @@ class NelderMead(object):
         return p
 
     def _parse_minmax(self, params):
+        types = ["real", "integer"]
         for name, values in params.items():
+            assert values[0] in types, "Invalid param type, Please check it."
+
             self.names.append(name)
-            self.p_min.append(values[0])
-            self.p_max.append(values[1])
+            self.p_types.append(values[0])
+            self.p_min.append(values[1][0])
+            self.p_max.append(values[1][1])
 
     def _initialize(self):
         for i in range(self.dim + 1):
