@@ -19,6 +19,31 @@ pip install git+https://github.com/owruby/nelder_mead.git
 
 - numpy
 
+## Usage
+
+```
+from nelder_mead import NelderMead
+
+
+def sphere(x):
+    return sum([t**2 for t in x])
+
+
+def main():
+    func = sphere
+    params = {
+        "x1": ["real", (-512, 512)],
+        "x2": ["real", (-512, 512)],
+    }
+
+    nm = NelderMead(func, params)
+    nm.minimize(n_iter=30)
+
+
+if __name__ == "__main__":
+    main()
+```
+
 ## References
 
 - https://academic.oup.com/comjnl/article-abstract/7/4/308/354237/A-Simplex-Method-for-Function-Minimization
