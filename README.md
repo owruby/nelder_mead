@@ -21,7 +21,7 @@ pip install git+https://github.com/owruby/nelder_mead.git
 
 ## Usage
 
-```
+``` python
 from nelder_mead import NelderMead
 
 
